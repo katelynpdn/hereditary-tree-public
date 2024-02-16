@@ -8,12 +8,13 @@ def arg_parser():
         description='Finds probabilities of inheriting trait for every person in a family'
     )
     # Define the command-line arguments.
-    raise NotImplementedError
+    parser.add_argument('i', type=str, help="csv file")
+    return parser.parse_args()
 
 
 # TODO IMPLEMENT. HINT: Workshop 4
 def file_type_checker(extension):
-    raise NotImplementedError
+    return (extension == "csv")
 
 
 def main():
@@ -26,6 +27,7 @@ def main():
     probabilities = dict()
 
     for person, data in people.items():
+
         '''
         TODO: iterate over the 'trait' value of 'data' to assign the 
             correct value in probabilities. 
@@ -43,8 +45,15 @@ def main():
                 "person2": ...
             }
         '''
-        raise NotImplementedError
-
+        for trait in data:
+            personDict = dict()
+            personDict["gene"] = {
+                        2: 1,
+                        1: 1, 
+                        0: 0
+                    }
+            personDict["trait"] = trait
+            probabilities[person] = personDict
 
 
     # calculate_trait will determine the phenotype('trait') based on genotype
@@ -72,6 +81,7 @@ def calculate_trait(probabilities, people):
                     using the people dictionary. Then assign the appropriate value in the
                     probabilities dictionary using the trait_helper() function.
             '''
+
             raise NotImplementedError
 
 # Note: This method will only work for beginners part of the project.
@@ -106,7 +116,15 @@ def trait_helper(genes1, genes2):
             that it could inherit the trait and store it in example_dict['trait]
             with values such as 1, 0.5, 0.25, etc.
     '''
-    raise NotImplementedError
+    # Possibiliites: AA & Aa, AA & aa, Aa & Aa, Aa & aa, 0 & 0
+    if (genes1 == 2 and genes2 == 1):
+        to_return['gene'][1] = .50
+        to_return['gene'][2] = .50
+    elif (genes1 == 2 and genes2 == 0):
+        to_return['gene'][1] = 1
+    
+    if (genes1['trait'] == 0):
+        to_return['trait'] = to_return['gene'][2] / ()
 
 
 
@@ -122,7 +140,7 @@ def load_data(filename):
         reader = csv.DictReader(f)
         for row in reader:
             # TODO: load data from each row into the dictionary data here
-            raise NotImplementedError
+            data[row['name']] = row['trait']
     return data
 
 # runs when we call the python file
