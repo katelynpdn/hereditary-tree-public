@@ -22,6 +22,8 @@ def main():
     ARGS = arg_parser()
 
     people = load_data(ARGS.i)
+    # print("people")
+    # print(people)
 
     # Keep track of gene and trait probabilities for each person
     probabilities = dict()
@@ -45,21 +47,36 @@ def main():
                 "person2": ...
             }
         '''
-        for trait in data:
-            personDict = dict()
+        print("data['trait']")
+        print(data['trait'])
+        personDict = dict()
+        if (data['trait'] == '1'):
+            print("true")
             personDict["gene"] = {
-                        2: 1,
-                        1: 1, 
-                        0: 0
-                    }
-            personDict["trait"] = trait
-            probabilities[person] = personDict
+                2: 1,
+                1: 0, 
+                0: 0
+            }
+        else:  #Trait is 0
+            print("false")
+            personDict["gene"] = {
+                2: 0,
+                1: 0, 
+                0: 1
+            }
+        
+        personDict["trait"] = data['trait']
+        probabilities[person] = personDict
 
-
+    # print("probabilities")
+    # print(probabilities)
+    
     # calculate_trait will determine the phenotype('trait') based on genotype
     calculate_trait(probabilities, people)
 
     # Print results
+    # print("people")
+    # print(people)
     for person in people:
         print(f"{person}:")
         for field in probabilities[person]:
@@ -71,18 +88,31 @@ def main():
                 p = probabilities[person][field][value]
                 print(f"    {value}: {p:.4f}")
 
-# This method will determine 
+# This method will determine the phenotype('trait') based on genotype
 def calculate_trait(probabilities, people):
     for person, data in probabilities.items():
         # we only want to calculate the trait when it is set to None
-        if data['trait'] == None:
+        # print("Right now trait is ")
+        # print(data['trait'])
+        if data['trait'] == '':
             '''
             TODO: fetch the father and mother genotypes from the 'person' we're looking at
                     using the people dictionary. Then assign the appropriate value in the
                     probabilities dictionary using the trait_helper() function.
             '''
+            father = people[person]["father"]
+            fatherGenotype = int(people[father]['trait'])
+            mother = people[person]["mother"]
+            motherGenotype = int(people[mother]['trait'])
+            # print("motherGenotype")
+            # print(motherGenotype)
+            # print("fatherGenotype")
+            # print(fatherGenotype)
 
-            raise NotImplementedError
+            data['trait'] = trait_helper(fatherGenotype, motherGenotype)["trait"]
+            data['gene'] = trait_helper(fatherGenotype, motherGenotype)["gene"]
+            # print("Updated trait to ")
+            # print(data['trait'])
 
 # Note: This method will only work for beginners part of the project.
 # Here we just walk through the gene and check what genotype the parent has
@@ -94,6 +124,9 @@ def parent_genotype(gene):
             return key
 
 # calculates probability of a child having a trait given parent's trait & genotype information
+# genes1, genes2 will be 0, 1, or 2
+# TRAIT IS RECESSIVE
+#returns to_return dictionary
 def trait_helper(genes1, genes2):
     to_return = {
         "gene": {
@@ -117,14 +150,27 @@ def trait_helper(genes1, genes2):
             with values such as 1, 0.5, 0.25, etc.
     '''
     # Possibiliites: AA & Aa, AA & aa, Aa & Aa, Aa & aa, 0 & 0
-    if (genes1 == 2 and genes2 == 1):
+    if ((genes1 == 2 and genes2 == 1) or (genes1 == 1 and genes2 == 2)): #AA & Aa
         to_return['gene'][1] = .50
         to_return['gene'][2] = .50
-    elif (genes1 == 2 and genes2 == 0):
+    elif ((genes1 == 2 and genes2 == 0) or (genes1 == 0 and genes2 == 2)): #AA & aa
         to_return['gene'][1] = 1
+    elif (genes1 == 1 and genes2 == 1): #Aa & Aa
+        to_return['gene'][0] = .25
+        to_return['gene'][1] = .50
+        to_return['gene'][2] = .25
+    elif ((genes1 == 1 and genes2 == 0) or (genes1 == 0 and genes2 == 1)): #Aa & aa
+        to_return['gene'][0] = .50
+        to_return['gene'][1] = .50
+    elif (genes1 == 2 and genes2 == 2): #AA and AA
+        to_return['gene'][2] = 1
+    else: #aa & aa
+        to_return['gene'][0] = 1
     
-    if (genes1['trait'] == 0):
-        to_return['trait'] = to_return['gene'][2] / ()
+    to_return['trait'] = (to_return['gene'][2])
+    # print("to_return")
+    # print(to_return)
+    return to_return
 
 
 
@@ -139,8 +185,12 @@ def load_data(filename):
     with open(filename) as f:
         reader = csv.DictReader(f)
         for row in reader:
+            data2 = dict()
             # TODO: load data from each row into the dictionary data here
-            data[row['name']] = row['trait']
+            data2['mother'] = row['mother']
+            data2['father'] = row['father']
+            data2['trait'] = row['trait']
+            data[row['name']] = data2
     return data
 
 # runs when we call the python file

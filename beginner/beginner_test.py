@@ -6,7 +6,7 @@ import csv
 import itertools
 import sys
 import argparse
-from heredity_beginner_pa import *
+from heredity_beginner import *
 
 class TestHeredity(unittest.TestCase):
 
